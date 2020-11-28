@@ -1,13 +1,17 @@
 #!/bin/bash
-#=================================================
-# Description: DIY script
-# Lisence: MIT
-# Author: P3TERX
-# Blog: https://p3terx.com
-#=================================================
 
-# 修改默认IP
-# sed -i 's/192.168.1.1/192.168.8.1/g' package/base-files/files/bin/config_generate
+cd openwrt
+
+# 安装额外依赖软件包
+# sudo -E apt-get -y install rename
+
+# 更新feeds文件
+# sed -i '$a src-git lienol https://github.com/Lienol/openwrt-package' openwrt/feeds.conf.default #启用passwall
+# cat feeds.conf.default
+
+# 更新并安装源
+./scripts/feeds clean
+./scripts/feeds update -a && ./scripts/feeds install -a
 
 # 添加第三方主题插件
 git clone https://github.com/openwrt-develop/luci-theme-atmaterial package/openwrt-packages/luci-theme-atmaterial
@@ -15,6 +19,17 @@ git clone https://github.com/rufengsuixing/luci-app-adguardhome package/openwrt-
 git clone https://github.com/tty228/luci-app-serverchan package/openwrt-packages/luci-app-serverchan
 git clone https://github.com/destan19/OpenAppFilter package/openwrt-packages/OpenAppFilter
 # git clone https://github.com/vernesong/OpenClash package/openwrt-packages/luci-app-OpenClash
+
+# 替换更新passwall和ssrplus+
+rm -rf package/openwrt-packages/luci-app-passwall && svn co https://github.com/xiaorouji/openwrt-package/trunk/lienol/luci-app-passwall package/openwrt-packages/luci-app-passwall
+rm -rf package/openwrt-packages/luci-app-ssr-plus && svn co https://github.com/fw876/helloworld package/openwrt-packages/helloworld
+
+# 添加passwall依赖库
+# git clone https://github.com/kenzok8/small package/small
+svn co https://github.com/xiaorouji/openwrt-package/trunk/package package/small
+
+# 替换https-dns-proxy.init文件,解决用LEDE源码加入passwall编译固件后DNS转发127.0.0.1#5053和12.0.0.1#5054问题
+curl -fsSL  https://raw.githubusercontent.com/Lienol/openwrt-packages/19.07/net/https-dns-proxy/files/https-dns-proxy.init > feeds/packages/net/https-dns-proxy/files/https-dns-proxy.init
 
 #创建自定义配置文件
 
