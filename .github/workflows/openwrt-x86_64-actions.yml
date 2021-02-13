@@ -18,7 +18,7 @@ on:
 #  release:
 #    types: [published]
 
-# 点赞触发
+# 点赞触发v  
   watch:
     types: [started]
 
